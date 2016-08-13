@@ -190,7 +190,7 @@ void SarahHome::connectMqtt() {
   }
 
   Serial.println("**MQTT Connected**");
-  mqttClient.publish(connectTopic, "true");
+  mqttClient.publish(connectTopic, "true", true);
 }
 
 void SarahHome::loop() {
