@@ -2,10 +2,6 @@
 
 KeyValueStore kvstore;
 
-SarahHome::SarahHome() {
-  SarahHome("sensors");
-}
-
 SarahHome::SarahHome(String type) {
   mqttClientNameFormat = "sarah-%d";
   deviceType = type;

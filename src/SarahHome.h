@@ -12,7 +12,6 @@
 class SarahHome
 {
   public:
-    SarahHome();
     SarahHome(String);
     void setup();
     void loop();
