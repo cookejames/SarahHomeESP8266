@@ -13,9 +13,11 @@ class SarahHome
 {
   public:
     SarahHome();
+    SarahHome(String);
     void setup();
     void loop();
     String getNodeId();
+    String getDeviceType();
     PubSubClient mqttClient;
   private:
     void setupVariables();
@@ -34,7 +36,8 @@ class SarahHome
     String mqttPassword;
     String mqttServer;
     String mqttClientNameFormat;
-    char mqttClientName[20];
+    char mqttClientName[50];
+    String deviceType;
     WiFiClient wifiClient;
 
     String wifiSsid;

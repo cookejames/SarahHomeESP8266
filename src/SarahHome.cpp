@@ -3,7 +3,12 @@
 KeyValueStore kvstore;
 
 SarahHome::SarahHome() {
+  SarahHome("sensors");
+}
+
+SarahHome::SarahHome(String type) {
   mqttClientNameFormat = "sarah-%d";
+  deviceType = type;
 }
 
 String SarahHome::readString(bool output) {
@@ -102,6 +107,10 @@ String SarahHome::getNodeId() {
   return nodeId;
 }
 
+String SarahHome::getDeviceType() {
+  return deviceType;
+}
+
 void SarahHome::setup() {
   setupKeyValueStore();
   setupVariables();
@@ -157,6 +166,8 @@ void SarahHome::connectMqtt() {
   mqttClient.setServer(mqttServer.c_str(), 1883);
 
   int attempts = 0;
+  char connectTopic[100];
+  sprintf(connectTopic, "%s/%s/connected", deviceType.c_str(), nodeId.c_str());
   while (!mqttClient.connected()) {
     Serial.printf("MQTT client name: %s\n", mqttClientName);
     Serial.printf("Attempting to connect to MQTT server: %s\n", mqttServer.c_str());
@@ -164,10 +175,10 @@ void SarahHome::connectMqtt() {
       mqttClientName,
       mqttUsername.c_str(),
       mqttPassword.c_str(),
-      "devices/disconnected",
+      connectTopic,
       0,
-      0,
-      nodeId.c_str()
+      1,
+      "false"
     );
     if (!connected) {
       Serial.print("MQTT Connection Error: ");
@@ -183,7 +194,7 @@ void SarahHome::connectMqtt() {
   }
 
   Serial.println("**MQTT Connected**");
-  mqttClient.publish("devices/connected", nodeId.c_str());
+  mqttClient.publish(connectTopic, "true");
 }
 
 void SarahHome::loop() {
