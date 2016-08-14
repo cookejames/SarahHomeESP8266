@@ -13,6 +13,7 @@ class SarahHome
 {
   public:
     SarahHome(String);
+    void setup(char const*);
     void setup();
     void loop();
     String getNodeId();
@@ -38,10 +39,9 @@ class SarahHome
     char mqttClientName[50];
     String deviceType;
     WiFiClient wifiClient;
-
     String wifiSsid;
     String wifiPassword;
-
     String nodeId;
+    char const* applicationVersion;
 };
 #endif

@@ -107,7 +107,8 @@ String SarahHome::getDeviceType() {
   return deviceType;
 }
 
-void SarahHome::setup() {
+void SarahHome::setup(char const* version) {
+  applicationVersion = version;
   setupKeyValueStore();
   setupVariables();
   connectWifi();
@@ -115,6 +116,10 @@ void SarahHome::setup() {
   connectMqtt();
   setupOTA();
   Serial.printf("Node %s ready\n", nodeId.c_str());
+}
+
+void SarahHome::setup() {
+  setup("na");
 }
 
 void SarahHome::setupOTA() {
@@ -137,6 +142,7 @@ void SarahHome::setupOTA() {
 
 void SarahHome::connectWifi() {
   WiFi.mode(WIFI_STA);
+  int attempts = 0;
   while (WiFi.status() != WL_CONNECTED) {
     Serial.printf("Attempting to connect to WPA SSID: %s\n", wifiSsid.c_str());
     // Connect to WPA/WPA2 network:
@@ -144,6 +150,12 @@ void SarahHome::connectWifi() {
 
     // wait 10 seconds for connection:
     delay(10000);
+
+    attempts++;
+    if (attempts >= 5) {
+      Serial.println("Failed to connnected to Wifi after 5 attempts, restarting...");
+      ESP.restart();
+    }
   }
 
   Serial.println("**WiFi connected**");
@@ -191,6 +203,10 @@ void SarahHome::connectMqtt() {
 
   Serial.println("**MQTT Connected**");
   mqttClient.publish(connectTopic, "true", true);
+
+  char versionTopic[100];
+  sprintf(connectTopic, "%s/%s/version", deviceType.c_str(), nodeId.c_str());
+  mqttClient.publish(connectTopic, applicationVersion, true);
 }
 
 void SarahHome::loop() {
