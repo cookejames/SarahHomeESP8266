@@ -19,9 +19,10 @@ class SarahHome
     String getNodeId();
     String getDeviceType();
     PubSubClient mqttClient;
+    boolean subscribe(const char* topic);
   private:
     void setupVariables();
-    void setMqttName();
+    void setupMqtt();
     void connectWifi();
     void connectMqtt();
     void setupOTA();
@@ -31,6 +32,7 @@ class SarahHome
     bool userConfirm();
     void enterUserValue(String);
     void setupKeyValueStore();
+    void subscribeToTopics();
 
     String mqttUsername;
     String mqttPassword;
@@ -43,5 +45,7 @@ class SarahHome
     String wifiPassword;
     String nodeId;
     char const* applicationVersion;
+    char const* mqttSubscriptions[20];
+    int mqttSubscriptionsLength;
 };
 #endif

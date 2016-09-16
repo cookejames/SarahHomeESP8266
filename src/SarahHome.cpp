@@ -5,6 +5,20 @@ KeyValueStore kvstore;
 SarahHome::SarahHome(String type) {
   mqttClientNameFormat = "sarah-%d";
   deviceType = type;
+  mqttSubscriptionsLength = 0;
+}
+
+/**
+ * Subscribe to MQTT topics, resubscribes on reconnects
+ */
+boolean SarahHome::subscribe(const char* topic) {
+  if (mqttSubscriptionsLength >= 20) {
+    return false;
+  }
+
+  mqttSubscriptions[mqttSubscriptionsLength] = topic;
+  mqttSubscriptionsLength++;
+  return mqttClient.subscribe(topic);
 }
 
 String SarahHome::readString(bool output) {
@@ -112,7 +126,7 @@ void SarahHome::setup(char const* version) {
   setupKeyValueStore();
   setupVariables();
   connectWifi();
-  setMqttName();
+  setupMqtt();
   connectMqtt();
   setupOTA();
   Serial.printf("Node %s ready\n", nodeId.c_str());
@@ -164,15 +178,23 @@ void SarahHome::connectWifi() {
   Serial.printf("Signal strength: %d\n", WiFi.RSSI());
 }
 
-void SarahHome::setMqttName() {
+void SarahHome::setupMqtt() {
   randomSeed(RANDOM_REG32);
   sprintf(mqttClientName, mqttClientNameFormat.c_str(), random(1000));
+  mqttClient = PubSubClient(wifiClient);
+  mqttClient.setServer(mqttServer.c_str(), 1883);
+}
+
+/**
+ * Subscribe to all MQTT topics
+ */
+void SarahHome::subscribeToTopics() {
+  for (int i = 0; i < mqttSubscriptionsLength; i++) {
+    mqttClient.subscribe(mqttSubscriptions[i]);
+  }
 }
 
 void SarahHome::connectMqtt() {
-  mqttClient = PubSubClient(wifiClient);
-  mqttClient.setServer(mqttServer.c_str(), 1883);
-
   int attempts = 0;
   char connectTopic[100];
   sprintf(connectTopic, "%s/%s/connected", deviceType.c_str(), nodeId.c_str());
@@ -207,6 +229,7 @@ void SarahHome::connectMqtt() {
   char versionTopic[100];
   sprintf(connectTopic, "%s/%s/version", deviceType.c_str(), nodeId.c_str());
   mqttClient.publish(connectTopic, applicationVersion, true);
+  subscribeToTopics();
 }
 
 void SarahHome::loop() {
