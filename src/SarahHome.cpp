@@ -6,6 +6,16 @@ SarahHome::SarahHome(String type) {
   mqttClientNameFormat = "sarah-%d";
   deviceType = type;
   mqttSubscriptionsLength = 0;
+  lastTime = 0;
+}
+
+boolean SarahHome::timer(int time) {
+  int now = millis();
+  if (now - lastTime > time) {
+    lastTime = now;
+    return true;
+  }
+  return false;
 }
 
 /**

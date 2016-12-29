@@ -20,6 +20,7 @@ class SarahHome
     String getDeviceType();
     PubSubClient mqttClient;
     boolean subscribe(const char* topic);
+    boolean timer(int time);
   private:
     void setupVariables();
     void setupMqtt();
@@ -47,5 +48,6 @@ class SarahHome
     char const* applicationVersion;
     char const* mqttSubscriptions[20];
     int mqttSubscriptionsLength;
+    int lastTime;
 };
 #endif
