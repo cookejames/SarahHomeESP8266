@@ -113,14 +113,14 @@ void SarahHome::setupKeyValueStore() {
 }
 
 void SarahHome::setupVariables() {
-  mqttUsername = kvstore.read("mqttUsername");
-  mqttPassword = kvstore.read("mqttPassword");
-  mqttServer = kvstore.read("mqttServer");
+  mqttUsername = kvstore.readString("mqttUsername");
+  mqttPassword = kvstore.readString("mqttPassword");
+  mqttServer = kvstore.readString("mqttServer");
 
-  wifiSsid = kvstore.read("wifiSsid");
-  wifiPassword = kvstore.read("wifiPassword");
+  wifiSsid = kvstore.readString("wifiSsid");
+  wifiPassword = kvstore.readString("wifiPassword");
 
-  nodeId = kvstore.read("nodeId");
+  nodeId = kvstore.readString("nodeId");
 }
 
 String SarahHome::getNodeId() {
